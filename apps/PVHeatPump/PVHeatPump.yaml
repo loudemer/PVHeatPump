@@ -1,0 +1,48 @@
+PVHeatPump:
+  class: PVHeatPump
+  module: PVHeatPump
+  log: pvheatpump_log
+  # Arret / Marche de l'application PAC
+  constrain_input_boolean: input_boolean.enable_heating
+
+  # temperature interieure
+  inside_temperature: sensor.temperature_cellier
+  # temperature exterieure
+  outside_temperature: sensor.temperature_toit
+  # temperature demandee
+  threshold_temperature: input_number.chauffage_demande
+  # mode confort ou reduit (absencer)
+  comfort_heating: input_boolean.chauffage_confort
+
+  # switch commande PAC
+  heat_pump_command: switch.relai_pac
+  # temperature circuit eau PAC
+  heat_pump_water_temperature: sensor.temperature_pac
+
+  # Couleur tempo du jour
+  current_tempo_color: sensor.rte_tempo_couleur_actuelle
+  # Couleur tempo du lendemain
+  tomorrow_tempo_color: sensor.rte_tempo_prochaine_couleur
+  # indicateur HP / HC
+  off_peak: binary_sensor.rte_tempo_heures_creuses
+
+  # Marche forcee (mode 2) 
+  forced_mode: input_boolean.marche_forcee_pac
+  # Duree marche forcee
+  forced_mode_max_duration: input_number.duree_max_marche_forcee_pac
+  # Prevision temperature lendemain matin
+  tomorrow_morning_temperature: sensor.temperature_forecast_next_day
+
+  # Prevision ensoleillement lendemain 
+  # tomorrow_solar_energy_forecast : sensor.energy_production_tomorrow
+  # Indicateur coupure de courant (onduleur) (Optionnel)
+  grid_power_online: sensor.ups_status
+
+  # Mise en route de la PAC par PVOptimizer : input_boolean.start_device_x
+  # (x etant le rang de l'appareil dans la liste commencant par 1)
+  # (optionnel)
+  start_heat_pump: input_boolean.start_device_4
+  # Application PVOptimizer disponible (optionnel)
+  enable_solar_optimizer: input_boolean.enable_solar_optimizer
+  # la demande de mise en route journée se fait directement sur PVOptimizer
+  # demande_pac: input_boolean.device_request_x 

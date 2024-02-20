@@ -1,0 +1,51 @@
+type: vertical-stack
+title: PAC
+cards:
+  - type: horizontal-stack
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: switch.relai_pac
+        tap_action:
+          action: more-info
+        hold_action:
+          action: toggle
+        icon_color: yellow
+        layout: vertical
+        name: Activation
+        primary_info: name
+        secondary_info: state
+      - type: custom:mushroom-entity-card
+        entity: input_boolean.marche_forcee_pac
+        icon_color: yellow
+        layout: vertical
+        tap_action:
+          action: toggle
+        hold_action:
+          action: more-info
+        name: Marche forcée
+        primary_info: name
+        secondary_info: state
+      - type: custom:mushroom-entity-card
+        entity: sensor.temperature_pac
+        layout: vertical
+        name: Temp eau PAC
+        primary_info: name
+        tap_action:
+          action: more-info
+  - type: horizontal-stack
+    cards:
+      - type: custom:mushroom-number-card
+        entity: input_number.duree_max_marche_forcee_pac
+        name: Durée M. forcée
+        icon: mdi:battery-clock-outline
+        icon_color: yellow
+        display_mode: buttons
+      - type: custom:mushroom-number-card
+        entity: input_number.chauffage_demande
+        name: Temp demandée
+        icon_color: accent
+        icon: mdi:temperature-celsius
+        primary_info: name
+        display_mode: buttons
+        tap_action:
+          action: more-info
