@@ -6,7 +6,7 @@ Ce mode de chauffage par PAC a pour particularité d’avoir une forte inertie q
 Les PAC ont une régulation interne, prenant en compte la température intérieure et la température extérieure pour assurer la régulation de la température en suivant la courbe d’eau. Elles fonctionnement souvent avec une horloge de fonctionnement et une sonde thermostatique intérieure.
 
 Ce logiciel vient remplacer le thermostat intérieur qui travaille sur un switch dans la PAC. Il permet d’optimiser la dépense énergétique en fonctionnant en heures creuses et si besoin, dans la journée au moment où la production solaire le permet. 
-Pour cela il est couplé à l’application PVOptimizer qui distribue l’énergie solaire à tous les gros consommateurs de la maison.
+Pour cela il est couplé à l’application **[PVOptimizer](https://github.com/loudemer/pvoptimizer)** qui distribue l’énergie solaire à tous les gros consommateurs de la maison.
 
 Il est possible de faire fonctionner cette application de manière autonome sans PVOptimizer. Le mode de fonctionnement 3 décrit ci-dessous n’est alors pas disponible
 # Fonctionnement
