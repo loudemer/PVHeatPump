@@ -114,6 +114,7 @@ PVHeatPump:
 
 # Le Dashboard
 A titre d’exemple vous trouverez dans le dépôt un fichier yaml d’exemple de configuration de base tout à fait perfectible.
+> ![Icon](https://github.com/loudemer/pvheatpump/images/dashboard.png?raw=true)
 ```
 type: vertical-stack
 title: PAC
