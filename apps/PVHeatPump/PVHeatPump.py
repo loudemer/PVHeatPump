@@ -1,9 +1,10 @@
 ##############################################################################################
 # PVHeatPump
 # Author: Gerard Mamelle (2024)
-# Version : Beta
+# Version : 1.0.0
 # Program under MIT licence
-##############################################################################################import hassapi as hass
+##############################################################################################
+import hassapi as hass
 import math
 import datetime
 from datetime import timedelta
@@ -267,6 +268,11 @@ class PVHeatPump(hass.Hass):
             if status_HP == "off" and inside_temperature < self.start_inside_threshold_temperature :
                 self.set_state(self.args['heat_pump_query'], state = 'on')
                 self.log ('Query HP on')
+                return
+            if status_HP == "on" and inside_temperature > self.start_inside_threshold_temperature :
+                self.set_state(self.args['heat_pump_query'], state = 'off')
+                self.turn_off(self.args['heat_pump_command'])
+                self.log ('Stop HP')
         
     #Start HP and Check if HP is running well
     def turn_on_HP(self):
