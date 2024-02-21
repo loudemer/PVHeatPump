@@ -126,7 +126,7 @@ class PVHeatPump(hass.Hass):
                 self.log("Power failure, heat pump off")
     
     def change_forced_mode_duration(self, entity, attribute, old_state, new_state, kwargs):
-        forced_mode_duration= self.get_safe_float("duree_max_forced_mode")
+        forced_mode_duration= self.get_safe_float("forced_mode_max_duration")
         if forced_mode_duration!= None:
             self.forced_max_duration = int(forced_mode_duration)
          
@@ -184,7 +184,8 @@ class PVHeatPump(hass.Hass):
     # Optimisation de la duree de fonctionnement de la HP
     def optimize_heating(self, kwargs):
         self.tomorrow_morning_temperature = self.get_safe_float("tomorrow_morning_temperature")
-        self.tomorrow_solar_energy_forecast = self.get_safe_float("tomorrow_solar_energy_forecast")
+        # if self.args['tomorrow_solar_energy_forecast'] != "":
+        #    self.tomorrow_solar_energy_forecast = self.get_safe_float("tomorrow_solar_energy_forecast")
         self.tomorrow_tempo_color = self.get_state(self.args["tomorrow_tempo_color"])
         # Conditions et duree de mise en route marche forcee
         if (self.inside_temperature > (self.start_inside_threshold_temperature - 1.0)
@@ -222,52 +223,50 @@ class PVHeatPump(hass.Hass):
         if inside_temperature == None or outside_temperature == None:
             return
 
-        # forced mode Regulation
+        # mode 2 Regulation
         if self.forced_mode == 'on':
             if self.off_peak == 'off':
                 if status_HP == "on":
                     self.turn_off(self.args['heat_pump_command'])
-                    #self.log_data()
                     self.log("Stop HP, Off peak off")
                     self.set_state(self.args['forced_mode'], state = 'off')
                     self.forced_mode_start_time = self.datetime() + timedelta(hours = 24)
-           # Mise en route forcee de la HP 
+           # Mise en route mode 2 de la HP 
             if self.forced_mode_start_time < self.datetime():
                 if status_HP == "off":
                     self.turn_on_HP()                    
-                    #self.log_data()
                     self.log("Start HP")
             return     
 
-        # Night Regulation
+        # Night Regulation mode 1
         if self.off_peak == 'on':
             if (inside_temperature <= self.start_inside_threshold_temperature 
                 and outside_temperature < OUTSIDE_THRESHOLD_TEMPERATURE):
                 if status_HP == "off":
                     self.turn_on_HP()
-                    #self.log_data()
                     self.log("Night Auto start HP")
                     return
             if status_HP == "on" and inside_temperature > self.start_inside_threshold_temperature:
                 self.turn_off(self.args['heat_pump_command'])
-                #self.log_data()
                 self.log("Night auto stop HP")
             return
 
-        # Day Regulation
+        # Day Regulation PVOptimizer
         if self.enable_solar_optimizer == 'on':
             if self.start_heat_pump == 'on':
-                if (inside_temperature > self.start_inside_threshold_temperature 
-                    or outside_temperature > OUTSIDE_THRESHOLD_TEMPERATURE) :
+                if inside_temperature < self.start_inside_threshold_temperature :
                     if status_HP == "off" and not self.current_tempo_color == 'Rouge' :
-                        #self.log_data()
                         self.turn_on_HP()                   
                         self.log("Start HP (PVOptimizer)")
+                        return
             else: # start HP off
                 if status_HP == "on":
                     self.turn_off(self.args['heat_pump_command'])
-                    #self.log_data()
                     self.log("Stop HP (PVOptimizer)")
+                    return
+            if status_HP == "off" and inside_temperature < self.start_inside_threshold_temperature :
+                self.set_state(self.args['heat_pump_query'], state = 'on')
+                self.log ('Query HP on')
         
     #Start HP and Check if HP is running well
     def turn_on_HP(self):

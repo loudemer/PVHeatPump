@@ -34,7 +34,7 @@ PVHeatPump:
   tomorrow_morning_temperature: sensor.temperature_forecast_next_day
 
   # Prevision ensoleillement lendemain 
-  # tomorrow_solar_energy_forecast : sensor.energy_production_tomorrow
+  tomorrow_solar_energy_forecast : sensor.energy_production_tomorrow
   # Indicateur coupure de courant (onduleur) (Optionnel)
   grid_power_online: sensor.ups_status
 
@@ -42,7 +42,7 @@ PVHeatPump:
   # (x etant le rang de l'appareil dans la liste commencant par 1)
   # (optionnel)
   start_heat_pump: input_boolean.start_device_4
+  # Demande de mise en route de la PAC a PVOptimizer (optionnel)
+  heat_pump_query: input_boolean.device_request_4
   # Application PVOptimizer disponible (optionnel)
   enable_solar_optimizer: input_boolean.enable_solar_optimizer
-  # la demande de mise en route journée se fait directement sur PVOptimizer
-  # demande_pac: input_boolean.device_request_x 

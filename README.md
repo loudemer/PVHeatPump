@@ -18,7 +18,7 @@ L’application utilise trois modes de fonctionnement qui peuvent se compléter
 Le logiciel met en route la PAC, une ou plusieurs heures en fin de nuit avant la bascule en heures pleines ce qui permet de chauffer la maison de manière optimale en gardant un maximum d’énergie pour la journée. Ce mode de fonctionnement est alternatif au premier. 
    Pour calculer le nombre d’heures de chauffe nécessaires, le logiciel prend en compte les températures extérieures et intérieures, ainsi que la prévision de température le lendemain matin. Il est prévu de prendre en compte la prévision de production solaire mais celle ci est pour l'instant peu fiable.
 1. Un fonctionnement diurne que l’on qualifiera de complémentaire dans les périodes de grand froid qui va se faire en plus du fonctionnement nocturne au moment où la production d’énergie solaire est maximale. Ce troisième mode est piloté par l’application : PVOptimizer. 
-   La demande de mise en route se fait sur le dasboard de PVOptimizer
+   La demande de mise en route peut se fait sur le dasboard de PVOptimizer sinon elle se fait automatiquement à partir de l'application lorsque la température demandé n'est pas atteinte.
 
 Le choix entre les modes 1 et 2 est effectuée par le logiciel en fonction des températures intérieures et extérieures le soir à 21h30.
 On peut sélectionner soi-même le mode 1 ou 2 si besoin.
@@ -28,7 +28,7 @@ On peut sélectionner soi-même le mode 1 ou 2 si besoin.
 - Installation de PVOptimiseur
 - Sensor relai PAC (en remplacement du contacteur du thermostat d’ambiance)
 - Couleur du jour pour les abonnements tempo 
-On peut utiliser l’API RTE par exemple. <https://www.api-couleur-tempo.fr/api>
+On peut utiliser l’**[API RTE](https://www.api-couleur-tempo.fr/api)**
 - Sensor Heures Creuses
 Disponible dans l’API RTE
 - Prévision de la température du lendemain
@@ -38,7 +38,7 @@ Disponible dans l’API RTE
 - Sensor température de consigne
 # Installation
 1. Installer **l’add-on appdaemon** à partir de paramètres / modules complémentaires si cela n’est pas déjà fait.
-1. **Télécharger le dépôt**[https://github.com/loudemer/PVHeatPump.git]
+1. **[Télécharger le dépôt](https://github.com/loudemer/PVHeatPump.git)**
 1. Mettre les fichiers *PVHeatPump.py et PVHeatPump.yaml* dans le répertoire *addon\_configs/a0d7b954\_appdaemon/apps*
 1. Mettre le fichier *optimizerentities.yaml* dans le répertoire */config/* de HA ou dans un sous répertoire dédié au fichiers yaml si vous en avez un.
 # Configuration
@@ -73,7 +73,7 @@ PVHeatPump:
   outside_temperature: sensor.temperature_toit
   # temperature demandee
   threshold_temperature: input_number.chauffage_demande
-  # mode confort ou reduit (absencer)
+  # mode confort ou reduit (absence)
   comfort_heating: input_boolean.chauffage_confort
 
   # switch commande PAC
@@ -104,10 +104,11 @@ PVHeatPump:
   # (x etant le rang de l'appareil dans la liste commencant par 1)
   # (optionnel)
   start_heat_pump: input_boolean.start_device_4
+  start_heat_pump: input_boolean.start_device_4
+  # Demande de mise en route de la PAC a PVOptimizer (optionnel)
+  heat_pump_query: input_boolean.device_request_4
   # Application PVOptimizer disponible (optionnel)
   enable_solar_optimizer: input_boolean.enable_solar_optimizer
-  # la demande de mise en route journée se fait directement sur PVOptimizer
-  # demande_pac: input_boolean.device_request_x 
 
 ```
 
@@ -170,10 +171,12 @@ cards:
 
 # Mode d’emploi
 Une fois l’installation réalisée, l’intégration est opérationnelle.
+Vous devez déterminer votre température seuil `threshold_temperature`,
+Chaque soir, vous pouvez intervenir sur le mode de fonctionnement nocturne (mode 1 ou 2) si celui qui a été choisi ne vous convient pas.
 
 ## Visualisation des problèmes
 L’intégration génère un fichier de log qui est stocké dans le fichier `/config/log/pvheatpump.log`.
-Il est possible aussi d’avoir plus de détails en appelant directement la console de debug d’appdaemon : [http://<ip_homeassistant>:5050]()
+Il est possible aussi d’avoir plus de détails en appelant directement la **[console de debug d’appdaemon](http://<ip_homeassistant>:5050)**
 
 Vous pourrez alors voir le démarrage et l’arrêt de l’intégration dans *main_log*, les erreurs éventuelles dans *error_log* et le déroulement de l’activité de l’intégration dans *pvheatpump_log*.
 # Désinstallation
