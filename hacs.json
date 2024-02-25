@@ -1,5 +1,6 @@
 {
     "name": "PVHeatPump",
     "country": "FR",
+    "render_readme": true,
     "homeassistant": "1.0.0"
 }
