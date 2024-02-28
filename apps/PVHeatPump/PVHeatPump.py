@@ -25,7 +25,7 @@ class PVHeatPump(hass.Hass):
         self.grid_power_online = self.get_state(self.args["grid_power_online"])
         self.start_heat_pump = 'off'
         self.set_state(self.args["start_heat_pump"],state='off')
-        
+        # forced mode = mode 2 (end night start)
         duree = self.get_safe_float("forced_mode_max_duration")
         if duree != None:
             self.forced_max_duration = int(duree)
@@ -99,7 +99,6 @@ class PVHeatPump(hass.Hass):
     def change_off_peak(self, entity, attribute, old_state, new_state, kwargs):
         self.log(f'Off peak = {new_state}')
         self.off_peak = new_state
-        # self.log_data()
         self.check_HP()
     
     # Change optimizer status
@@ -254,27 +253,32 @@ class PVHeatPump(hass.Hass):
 
         # Day Regulation PVOptimizer
         if self.enable_solar_optimizer == 'on':
+            # start HP if start command is on
             if self.start_heat_pump == 'on':
                 if inside_temperature < self.start_inside_threshold_temperature :
                     if status_HP == "off" and not self.current_tempo_color == 'Rouge' :
                         self.turn_on_HP()                   
                         self.log("Start HP (PVOptimizer)")
                         return
-            else: # start HP off
+            # stop HP if start command is off
+            else: 
                 if status_HP == "on":
                     self.turn_off(self.args['heat_pump_command'])
                     self.log("Stop HP (PVOptimizer)")
                     return
-            if status_HP == "off" and inside_temperature < self.start_inside_threshold_temperature :
+            # set required pvoptimizer status on if inside temp is low
+            if status_HP == "off" and inside_temperature < self.start_inside_threshold_temperature and self.current_tempo_color == "Bleu":
                 self.set_state(self.args['heat_pump_query'], state = 'on')
                 self.log ('Query HP on')
                 return
+
+            # stop HP if inside temp is high
             if status_HP == "on" and inside_temperature > self.start_inside_threshold_temperature :
                 self.set_state(self.args['heat_pump_query'], state = 'off')
                 self.turn_off(self.args['heat_pump_command'])
                 self.log ('Stop HP')
         
-    #Start HP and Check if HP is running well
+    # Start HP and Check if HP is running well
     def turn_on_HP(self):
         self.turn_on(self.args['heat_pump_command'])
         if self.args['heat_pump_water_temperature'] != "":
@@ -289,7 +293,7 @@ class PVHeatPump(hass.Hass):
         if temperature == None:
             return
         if temperature < 24.0:
-            self.call_service("notify/mobile_app_iphone_gerard",message="HP not running well")
+            self.call_service("notify/telegram_maison",message="HP not running well")
             self.log("HP not running well")
 
     def getdifference_minutes(self,recent, old):
@@ -297,13 +301,3 @@ class PVHeatPump(hass.Hass):
         minutes = diff.total_seconds() / 60
         return int(minutes)
     
-    # Log data
-    def log_data(self):
-        self.log(f'status Off peak = {self.off_peak}')
-        self.log(f'status PVOptimizer = {self.enable_solar_optimizer}')
-        self.log(f'status Onduleur = {self.grid_power_online}')
-        self.log(f'comfort_heating = {self.comfort_heating}')
-        self.log(f'Temperature cellier = {self.inside_temperature}')
-        self.log(f'Temperature exterieure = {self.outside_temperature}')
-        self.log(f'Tempo color = {self.current_tempo_color}')
-

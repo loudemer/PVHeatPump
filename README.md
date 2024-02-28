@@ -114,74 +114,84 @@ PVHeatPump:
 
 # Le Dashboard
 A titre d’exemple vous trouverez dans le dépôt un fichier yaml d’exemple de configuration de base tout à fait perfectible.
-> ![Icon](https://github.com/loudemer/pvheatpump/blob/main/images/dashboard.png?raw=true)
+
+![Icon](https://github.com/loudemer/pvheatpump/blob/main/images/dashboard.png?raw=true)
 ```
-type: vertical-stack
-title: PAC
-cards:
-  - type: horizontal-stack
-    cards:
-      - type: custom:mushroom-entity-card
-        entity: switch.relai_pac
-        tap_action:
-          action: more-info
-        hold_action:
-          action: toggle
-        icon_color: yellow
-        layout: vertical
-        name: Activation
-        primary_info: name
-        secondary_info: state
-      - type: custom:mushroom-entity-card
-        entity: input_boolean.marche_forcee_pac
-        icon_color: yellow
-        layout: vertical
-        tap_action:
-          action: toggle
-        hold_action:
-          action: more-info
-        name: Marche forcée
-        primary_info: name
-        secondary_info: state
-      - type: custom:mushroom-entity-card
-        entity: sensor.temperature_pac
-        layout: vertical
-        name: Temp eau PAC
-        primary_info: name
-        tap_action:
-          action: more-info
-  - type: horizontal-stack
-    cards:
-      - type: custom:mushroom-number-card
-        entity: input_number.duree_max_marche_forcee_pac
-        name: Durée M. forcée
-        icon: mdi:battery-clock-outline
-        icon_color: yellow
-        display_mode: buttons
-      - type: custom:mushroom-number-card
-        entity: input_number.chauffage_demande
-        name: Temp demandée
-        icon_color: accent
-        icon: mdi:temperature-celsius
-        primary_info: name
-        display_mode: buttons
-        tap_action:
-          action: more-info
+  type: vertical-stack
+  title: PAC
+  cards:
+    - type: horizontal-stack
+      cards:
+        - type: custom:mushroom-entity-card
+          entity: switch.relai_pac
+          tap_action:
+            action: more-info
+          hold_action:
+            action: toggle
+          icon_color: yellow
+          layout: vertical
+          name: Activation
+          primary_info: name
+          secondary_info: state
+        - type: custom:mushroom-entity-card
+          entity: input_boolean.marche_forcee_pac
+          icon_color: yellow
+          layout: vertical
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+          name: Marche forcée
+          primary_info: name
+          secondary_info: state
+        - type: custom:mushroom-entity-card
+          entity: sensor.temperature_pac
+          layout: vertical
+          name: Temp eau PAC
+          primary_info: name
+          tap_action:
+            action: more-info
+    - type: horizontal-stack
+      cards:
+        - type: custom:mushroom-number-card
+          entity: input_number.duree_max_marche_forcee_pac
+          name: Durée M. forcée
+          icon: mdi:battery-clock-outline
+          icon_color: yellow
+          display_mode: buttons
+        - type: custom:mushroom-number-card
+          entity: input_number.chauffage_demande
+          name: Temp demandée
+          icon_color: accent
+          icon: mdi:temperature-celsius
+          primary_info: name
+          display_mode: buttons
+          tap_action:
+            action: more-info
 
 ```
 
 # Mode d’emploi
 Une fois l’installation réalisée, l’intégration est opérationnelle.
-Vous devez déterminer votre température seuil `threshold_temperature`,
+
+Vous devez déterminer votre température de consigne `threshold_temperature`.
+
+Pour demander la mise en route de la PAC, il faut cliquer sur l'icône PAC, à gauche. Il passe du gris au vert.
+Si la production solaire est suffisante, la PAC est mise en route, le deuxième icône devient vert et la puissance de fonctionnement s'affiche sur le 3eme icône et la durée de fonctionnement sur le 4ème icône.
+
+La charge s'arrêtera au bout du délai imparti ou lorsque la température de consigne sera atteinte.
+
 Chaque soir, vous pouvez intervenir sur le mode de fonctionnement nocturne (mode 1 ou 2) si celui qui a été choisi ne vous convient pas.
 
 ## Visualisation des problèmes
 L’intégration génère un fichier de log qui est stocké dans le fichier `/config/log/pvheatpump.log`.
 Il est possible aussi d’avoir plus de détails en appelant directement la **[console de debug d’appdaemon](http://<ip_homeassistant>:5050)**
 
-Vous pourrez alors voir le démarrage et l’arrêt de l’intégration dans *main_log*, les erreurs éventuelles dans *error_log* et le déroulement de l’activité de l’intégration dans *pvheatpump_log*.
+Vous pourrez alors voir le démarrage et l’arrêt de l’intégration dans `main_log`, les erreurs éventuelles dans `error_log` et le déroulement de l’activité de l’intégration dans `pvheatpump_log`.
 # Désinstallation
-Il faut retirer les 2 fichiers *PVHeatPump.py et PVHeatPump.py.yaml* dans le répertoire *addon\_configs/a0d7b954\_appdaemon/apps/*
-Retirer aussi le dashboard PVHeatPump
+Il faut retirer les 2 fichiers `PVHeatPump.py` et `PVHeatPump.py.yaml` dans le répertoire `addon\_configs/a0d7b954\_appdaemon/apps/`
+
+Retirer aussi le dashboard PVHeatPump.
+
 Redémarrer HA.
 
