@@ -1,7 +1,7 @@
 ##############################################################################################
 # PVHeatPump
 # Author: Gerard Mamelle (2024)
-# Version : 1.0.0
+# Version : 1.0.1
 # Program under MIT licence
 ##############################################################################################
 import hassapi as hass
@@ -132,10 +132,7 @@ class PVHeatPump(hass.Hass):
          
     def change_forced_mode(self, entity, attribute, old_state, new_state, kwargs):
         self.forced_mode = new_state
-        if self.forced_mode == 'off':
-            self.check_HP()
-        else:
-            self.forced_mode_start_time = self.datetime() + timedelta(hours = 24)
+        self.check_forced_mode(None)
     
     def change_threshold_temperature(self, entity, attribute, old_state, new_state, kwargs):
         self.start_inside_threshold_temperature = self.get_safe_float("threshold_temperature")
@@ -170,14 +167,14 @@ class PVHeatPump(hass.Hass):
 
     # Mise en route marche forcee 
     def check_forced_mode(self,kwargs):
+        if self.timer != None: 
+            self.cancel_timer(self.timer)
         if self.forced_mode == 'off':
             self.forced_mode_start_time = self.datetime() + timedelta(hours = 24)
         else:
             delai = 5 - self.forced_max_duration
             self.forced_mode_start_time = self.datetime() + timedelta(hours = delai)
             self.log(f'start time = {self.forced_mode_start_time}')
-            if self.timer != None: 
-                self.cancel_timer(self.timer)
             self.timer = self.run_at(self.do_check_HP, self.forced_mode_start_time)
             self.check_HP()
     
@@ -218,9 +215,7 @@ class PVHeatPump(hass.Hass):
         except KeyError:
             self.log(f'Could not get status HP : {status_HP}')
             return
-        outside_temperature = self.outside_temperature
-        inside_temperature = self.inside_temperature
-        if inside_temperature == None or outside_temperature == None:
+        if self.inside_temperature == None or self.outside_temperature == None:
             return
 
         # mode 2 Regulation
@@ -231,6 +226,7 @@ class PVHeatPump(hass.Hass):
                     self.log("Stop HP, Off peak off")
                     self.set_state(self.args['forced_mode'], state = 'off')
                     self.forced_mode_start_time = self.datetime() + timedelta(hours = 24)
+                return
            # Mise en route mode 2 de la HP 
             if self.forced_mode_start_time < self.datetime():
                 if status_HP == "off":
@@ -240,13 +236,13 @@ class PVHeatPump(hass.Hass):
 
         # Night Regulation mode 1
         if self.off_peak == 'on':
-            if (inside_temperature <= self.start_inside_threshold_temperature 
-                and outside_temperature < OUTSIDE_THRESHOLD_TEMPERATURE):
+            if (self.inside_temperature <= self.start_inside_threshold_temperature 
+                and self.outside_temperature < OUTSIDE_THRESHOLD_TEMPERATURE):
                 if status_HP == "off":
                     self.turn_on_HP()
                     self.log("Night Auto start HP")
                     return
-            if status_HP == "on" and inside_temperature > self.start_inside_threshold_temperature:
+            if status_HP == "on" and self.inside_temperature > self.start_inside_threshold_temperature:
                 self.turn_off(self.args['heat_pump_command'])
                 self.log("Night auto stop HP")
             return
@@ -255,7 +251,7 @@ class PVHeatPump(hass.Hass):
         if self.enable_solar_optimizer == 'on':
             # start HP if start command is on
             if self.start_heat_pump == 'on':
-                if inside_temperature < self.start_inside_threshold_temperature :
+                if self.inside_temperature < self.start_inside_threshold_temperature :
                     if status_HP == "off" and not self.current_tempo_color == 'Rouge' :
                         self.turn_on_HP()                   
                         self.log("Start HP (PVOptimizer)")
@@ -266,14 +262,14 @@ class PVHeatPump(hass.Hass):
                     self.turn_off(self.args['heat_pump_command'])
                     self.log("Stop HP (PVOptimizer)")
                     return
-            # set required pvoptimizer status on if inside temp is low
-            if status_HP == "off" and inside_temperature < self.start_inside_threshold_temperature and self.current_tempo_color == "Bleu":
-                self.set_state(self.args['heat_pump_query'], state = 'on')
-                self.log ('Query HP on')
-                return
+            # set required pvoptimizer status on if inside temp is low, better to do manually
+            #if status_HP == "off" and self.inside_temperature < self.start_inside_threshold_temperature and self.current_tempo_color == "Bleu":
+            #    self.set_state(self.args['heat_pump_query'], state = 'on')
+            #    self.log ('Query HP on')
+            #    return
 
             # stop HP if inside temp is high
-            if status_HP == "on" and inside_temperature > self.start_inside_threshold_temperature :
+            if status_HP == "on" and self.inside_temperature > self.start_inside_threshold_temperature :
                 self.set_state(self.args['heat_pump_query'], state = 'off')
                 self.turn_off(self.args['heat_pump_command'])
                 self.log ('Stop HP')
