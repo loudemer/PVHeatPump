@@ -3,7 +3,7 @@ PVHeatPump:
   module: PVHeatPump
   log: pvheatpump_log
   # Arret / Marche de l'application PAC
-  constrain_input_boolean: input_boolean.enable_heating
+  constrain_input_boolean: input_boolean.activate_hp
 
   # temperature interieure
   inside_temperature: sensor.temperature_cellier
@@ -33,10 +33,10 @@ PVHeatPump:
   # Prevision temperature lendemain matin
   tomorrow_morning_temperature: sensor.temperature_forecast_next_day
 
-  # Prevision ensoleillement lendemain 
-  tomorrow_solar_energy_forecast : sensor.energy_production_tomorrow
   # Indicateur coupure de courant (onduleur) (Optionnel)
   grid_power_online: sensor.ups_status
+  # presence maison
+  presence_maison: input_boolean.presence_maison
 
   # Mise en route de la PAC par PVOptimizer : input_boolean.start_device_x
   # (x etant le rang de l'appareil dans la liste commencant par 1)
